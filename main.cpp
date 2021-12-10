@@ -20,26 +20,42 @@ std::vector<std::vector<int>> B;
 
 std::vector<std::vector<int>> allStates;
 
+// Uses B+ and B- to find B
 void calculateIncidentMatrix();
+
+// Takes a marking state, and the x transition vector, and uses them to find the next marking
+// using the formula M(k+1) = M(k) + B*x
 void calculateNextMarking(std::vector<int> m, std::vector<int> x);
+
+// Takes a marking state, and calculates if firing happens or not by comparing it
+// with every column in B-
 void findFiringTransitions(std::vector<int> m);
+
+// Takes the name of the 2d matrix and prints it 
 void printMatrix(std::string name, std::vector<std::vector<int>> vect);
+
+// Forms x1, x2, .., xn, which are all stored in matrix X
 void formXVector();
+
+void clearXVectorAndFiringStates();
 
 int main() {
     allStates.push_back(M_0);
 
     calculateIncidentMatrix();
-
-    findFiringTransitions(M_0);
-    formXVector();
         
-    for(int i = 0; i < X.size(); i++) {
-        for(int j = 0; j < X[i].size(); j++)
-            if(X[i][j] != 0) {
-                calculateNextMarking(M_0, X[i]);
-                break;
-            }
+    for(int k = 0; k < allStates.size(); k++) {
+        findFiringTransitions(allStates[k]);
+        formXVector();
+        for(int i = 0; i < X.size(); i++) {
+            for(int j = 0; j < X[i].size(); j++)
+                if(X[i][j] != 0) {
+                    calculateNextMarking(allStates[k], X[i]);
+                    break;
+                }
+        }
+
+        clearXVectorAndFiringStates();
     }
 
     printMatrix("All States", allStates);
@@ -118,7 +134,7 @@ void calculateNextMarking(std::vector<int> m, std::vector<int> x) {
     allStates.push_back(newMarking);  
 }
 
-void formXVector() {   
+void formXVector() {
     if(t1 == true) 
         x1[0] = 1;
     if(t2 == true) 
@@ -129,4 +145,16 @@ void formXVector() {
     X.push_back(x1);
     X.push_back(x2);
     X.push_back(x3);
+}
+
+void clearXVectorAndFiringStates() {
+    x1[0] = 0;
+    x2[1] = 0;
+    x3[2] = 0;
+
+    X.clear();
+
+    t1 = true;
+    t2 = true;
+    t3 = true;
 }
