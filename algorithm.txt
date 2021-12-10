@@ -1,0 +1,12 @@
+1- Calculate Inciden matrix B:
+B = B_plus - B_minus
+
+2- Find all firing transitions from the marking state
+the first marking is M_0
+
+3- assign x1, x2, ..., xn corresponding to the firing transitions
+
+4- Find all marking states that branch off M_0 
+Do the calculations for all transitions that are equal to true by passing the correct x
+
+5- reset all the transitoins to false, and repeat steps starting from step 2 by changing the marked state
