@@ -6,9 +6,7 @@ bool t1 = true;
 bool t2 = true;
 bool t3 = true;
 
-std::vector<int> x1 = {0, 0, 0};
-std::vector<int> x2 = {0, 0, 0};
-std::vector<int> x3 = {0, 0, 0};
+std::vector<bool> transitions;
 
 std::vector<std::vector<int>> X;
 
@@ -31,37 +29,33 @@ void calculateNextMarking(std::vector<int> m, std::vector<int> x);
 // with every column in B-
 void findFiringTransitions(std::vector<int> m);
 
-// Takes the name of the 2d matrix and prints it 
-void printMatrix(std::string name, std::vector<std::vector<int>> vect);
+void findAllStatesFromInitialMarking();
 
 // Forms x1, x2, .., xn, which are all stored in matrix X
 void formXVector();
 
+void formTransitionsVector();
+
 void clearXVectorAndFiringStates();
+
+// Takes the name of the 2d matrix and prints it 
+void printMatrix(std::string name, std::vector<std::vector<int>> vect);
+
+void printAllStates();
+
 
 int main() {
     allStates.push_back(M_0);
 
     calculateIncidentMatrix();
-        
-    for(int k = 0; k < allStates.size(); k++) {
-        findFiringTransitions(allStates[k]);
-        formXVector();
-        for(int i = 0; i < X.size(); i++) {
-            for(int j = 0; j < X[i].size(); j++)
-                if(X[i][j] != 0) {
-                    calculateNextMarking(allStates[k], X[i]);
-                    break;
-                }
-        }
 
-        clearXVectorAndFiringStates();
-    }
+    findAllStatesFromInitialMarking();
 
-    printMatrix("All States", allStates);
+    printAllStates();
 
     return 0;
 }
+
 
 void calculateIncidentMatrix() {
     std::vector<int> temp;
@@ -75,39 +69,55 @@ void calculateIncidentMatrix() {
 
 }
 
+void findAllStatesFromInitialMarking() {
+    formTransitionsVector();
+
+    for(int k = 0; k < allStates.size(); k++) {
+        findFiringTransitions(allStates[k]);
+        formXVector();
+        for(int i = 0; i < X.size(); i++) {
+            for(int j = 0; j < X[i].size(); j++)
+                if(X[i][j] != 0) {
+                    calculateNextMarking(allStates[k], X[i]);
+                    break;
+                }
+        }
+
+        clearXVectorAndFiringStates();
+    }
+}
+
+void formTransitionsVector() {
+    transitions.push_back(t1);
+    transitions.push_back(t2);
+    transitions.push_back(t3);
+}
+
 void findFiringTransitions(std::vector<int> m) {
-    for(int row = 0; row < B.size(); row++)
-        for(int column = 0; column < B[row].size(); column++) { 
-            if(column == 0) {
-                if(m[row] < B_minus[row][column])
-                    t1 = false;
-                else if(t1 != false)
-                    t1 = true;
-            }
-            else if(column == 1) {
-                if(m[row] < B_minus[row][column])
-                    t2 = false;
-                else if(t2 != false)
-                    t2 = true;
-            }
-            else {
-                if(m[row] < B_minus[row][column])
-                    t3 = false;
-                else if(t3 != false)
-                    t3 = true;
-            }   
+    for(int column = 0; column < B_minus.size(); column++)
+        for(int row = 0; row < B_minus[column].size(); row++) { 
+            if(m[row] < B_minus[row][column])
+                transitions[column] = false;
+            else if(transitions[column] != false)
+                transitions[column] = true;
         }
 }
 
-void printMatrix(std::string name, std::vector<std::vector<int>> vect) {
-    std::cout << "matrix " << name << ": \n";
-    for(int row = 0; row < vect.size(); row++) {
-        for(int column = 0; column < vect[row].size(); column++) {
-            std::cout << vect[row][column] << " ";
-        }
-        std::cout << "\n";
+void formXVector() {
+    std::vector<int> tempX;
+
+    for(int i = 0; i < transitions.size(); i++) {
+        tempX.push_back(0);
     }
-    std::cout << "\n";
+
+    for(int i = 0; i < transitions.size(); i++) {
+        if(transitions[i] == true)
+            tempX[i] = 1;
+        else
+            for(int j = 0; j < tempX.size(); j++)
+                tempX[j] = 0;
+        X.push_back(tempX);
+    }
 }
 
 void calculateNextMarking(std::vector<int> m, std::vector<int> x) {
@@ -134,27 +144,29 @@ void calculateNextMarking(std::vector<int> m, std::vector<int> x) {
     allStates.push_back(newMarking);  
 }
 
-void formXVector() {
-    if(t1 == true) 
-        x1[0] = 1;
-    if(t2 == true) 
-        x2[1] = 1;
-    if(t3 == true)
-        x3[2] = 1;
-
-    X.push_back(x1);
-    X.push_back(x2);
-    X.push_back(x3);
-}
-
 void clearXVectorAndFiringStates() {
-    x1[0] = 0;
-    x2[1] = 0;
-    x3[2] = 0;
-
     X.clear();
 
-    t1 = true;
-    t2 = true;
-    t3 = true;
+    for(int i = 0; i < transitions.size(); i++)
+        transitions[i] = true;
+}
+
+void printMatrix(std::string name, std::vector<std::vector<int>> vect) {
+    std::cout << "matrix " << name << ": \n";
+    for(int row = 0; row < vect.size(); row++) {
+        for(int column = 0; column < vect[row].size(); column++)
+            std::cout << vect[row][column] << " ";
+        std::cout << "\n";
+    }
+    std::cout << "\n";
+}
+
+void printAllStates() {
+    for(int row = 0; row < allStates.size(); row++) {
+        std::cout << "\n\nstate " << row + 1 << ": ";
+        for(int column = 0; column < allStates[row].size(); column++)
+            std::cout << allStates[row][column] << " ";
+    }
+
+    std::cout << "\n";
 }
