@@ -1,12 +1,23 @@
 1- Calculate Inciden matrix B:
 B = B_plus - B_minus
 
-2- Find all firing transitions from the marking state
-the first marking is M_0
+2- Calculate controller incident matrix 
+B_controller = -LB
 
-3- assign x1, x2, ..., xn corresponding to the firing transitions
+3- Find incident of the entire petri by adding B and B_controller to one matrix
+B_controller += B
 
-4- Find all marking states that branch off M_0 
+4- Find petri net initial marking
+M_C_0 = b - LM
+
+5- Find initial marking of the entire petri net by adding M0 and M_C_0 to one matrix
+M_C_0 += M0
+
+6- Find all firing transitions from M_C_0
+
+7- assign x1, x2, ..., xn corresponding to the firing transitions
+
+8- Find all marking states that branch off M_C_0 
 Do the calculations for all transitions that are equal to true by passing the correct x
 
-5- reset all the transitoins to false, and repeat steps starting from step 2 by changing the marked state
+9- reset all the transitoins to false, and repeat steps starting from step 2 by changing the marked state
