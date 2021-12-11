@@ -20,4 +20,4 @@ M_C_0 += M0
 8- Find all marking states that branch off M_C_0 
 Do the calculations for all transitions that are equal to true by passing the correct x
 
-9- reset all the transitoins to false, and repeat steps starting from step 2 by changing the marked state
+9- reset all the transitoins, and repeat steps starting from step 6 by changing the marked state
